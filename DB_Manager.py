@@ -7,7 +7,7 @@ def sql_con(database):
     except Error:
         print('Error')
 
-def sql_expedia_read(con, table):
+def sql_read(con, table):
     try:
         print("The SQLite connection is open")
         cursorObj = con.cursor()
@@ -23,23 +23,24 @@ def sql_expedia_read(con, table):
             #print(recordList)
         return recordList
     except sqlite3.Error as error:
-        print("Error while using sql_expedia_read", error)
+        print("Error while using sql_expedia", error)
     finally:
         if (con):
             con.close()
             print("The SQLite connection is closed")
 
-def sql_expedia_insert(con, list, table):
+def sql_insert(con, tableString, columnsString, valuesList):
     try:
         cursorObj = con.cursor()
-        for element in list:
+        insertCmd = 'INSERT INTO' + tableString +' (' + columnsString + ') ' +  'VALUES(?, ?, ?, ?)'
+        for element in valuesList:
             entities = (element[0], element[1], element[2], element[3])
             print(entities)
-            cursorObj.execute('INSERT INTO (batch, quantity, analyst, batchdate) VALUES(?, ?, ?, ?)', entities)
+            cursorObj.execute(insertCmd, entities)
             con.commit()
         cursorObj.close()
     except sqlite3.Error as error:
-        print("Error while using sql_insert_expedia", error)
+        print("Error while using sql_insert", error)
     finally:
         if (con):
             con.close()
