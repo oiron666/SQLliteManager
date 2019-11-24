@@ -34,7 +34,9 @@ def sql_read(con, table, columns, where):
 def sql_insert(con, table, columns, valuesList):
     try:
         cursorObj = con.cursor()
-        insertCmd = 'INSERT INTO ' + table +' (' + columns + ') ' +  'VALUES(?, ?, ?, ?)'
+        tableName = table
+        columnNames = columns
+        insertCmd = 'INSERT INTO ' + tableName +' (' + columnNames + ') ' +  'VALUES(?, ?, ?, ?)'
         for element in valuesList:
             entities = (element[0], element[1], element[2], element[3])
             print(entities)
@@ -48,14 +50,58 @@ def sql_insert(con, table, columns, valuesList):
             con.close()
             print("The SQLite connection is closed")
 
-def sql_update(con, table, set, where):
+def sql_update(con, table, column, value, where):
     try:
         cursorObj = con.cursor()
-        updateCmd = 'UPDATE ' + table + ' SET ' + set + ' WHERE ' + where
+        tableName = table
+        columnName = column
+        valueName = valueName
+        whereName = where
+        updateCmd = 'UPDATE ' + tableName + ' SET ' + columnName + ' = ' + valueName + ' WHERE ' + where
         cursorObj.execute(updateCmd)
         con.commit()
     except sqlite3.Error as error:
         print("Error while using sql_insert", error)
+    finally:
+        if (con):
+            con.close()
+            print("The SQLite connection is closed")
+
+def sql_list_tables(con):
+    try:
+        cursorObj = con.cursor()
+        cursorObj.execute('SELECT name from sqlite_master where type= "table"')
+        print(cursorObj.fetchall())
+    except sqlite3.Error as error:
+        print("Error while using sql_list_tables", error)
+    finally:
+        if (con):
+            con.close()
+            print("The SQLite connection is closed")
+
+def sql_create_table(con, table, columns):
+    #columns must be provided with types
+    try:
+        cursorObj = con.cursor()
+        tableName = table
+        columnNames = columns
+        cursorObj.execute('create table if not exists ' +  tableName + ' ( ' + columnNames + ' )')
+        con.commit()
+    except sqlite3.Error as error:
+        print("Error while using sql_create_table", error)
+    finally:
+        if (con):
+            con.close()
+            print("The SQLite connection is closed")
+
+def sql_drop_table(con, table):
+    try:
+        cursorObj = con.cursor()
+        tableName = table
+        cursorObj.execute('drop table if exists ' +  tableName )
+        con.commit()
+    except sqlite3.Error as error:
+        print("Error while using sql_drop_table", error)
     finally:
         if (con):
             con.close()
